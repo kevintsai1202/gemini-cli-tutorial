@@ -80,8 +80,142 @@
             position: fixed;
             height: 100vh;
             overflow-y: auto;
+            overflow-x: hidden;
             z-index: 1000;
             transition: var(--transition);
+            padding-right: 10px;
+        }
+
+        /* 側邊欄縮放狀態 */
+        .sidebar.collapsed {
+            width: 70px;
+            padding-right: 0;
+        }
+
+        /* 縮放按鈕 */
+        .sidebar-toggle {
+            position: fixed;
+            top: 50%;
+            left: 290px;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 50px;
+            background: var(--primary);
+            border: none;
+            border-radius: 0 6px 6px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 1001;
+            box-shadow: 2px 0 8px var(--shadow);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--primary-dark);
+            left: 292px;
+            box-shadow: 2px 0 12px var(--shadow);
+        }
+
+        /* 側邊欄收合時調整按鈕位置 */
+        .sidebar.collapsed ~ * .sidebar-toggle,
+        .sidebar.collapsed .sidebar-toggle {
+            left: 60px;
+        }
+
+        .sidebar.collapsed .sidebar-toggle:hover {
+            left: 62px;
+        }
+
+        .sidebar-toggle i {
+            color: white;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        /* 縮放狀態下隱藏文字內容 */
+        .sidebar.collapsed .sidebar-header .header-text,
+        .sidebar.collapsed .sidebar-header .duration,
+        .sidebar.collapsed .progress-container,
+        .sidebar.collapsed .timer-container,
+        .sidebar.collapsed .theme-toggle,
+        .sidebar.collapsed .nav-item span,
+        .sidebar.collapsed .nav-item .duration {
+            display: none;
+        }
+
+        /* 縮放狀態下的側邊欄標題 */
+        .sidebar.collapsed .sidebar-header {
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .sidebar-header h1 {
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .sidebar.collapsed .sidebar-header h1 i {
+            margin: 0;
+        }
+
+        /* 縮放狀態下的導航項目 */
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 1rem 0;
+            border-left: none;
+            position: relative;
+        }
+
+        .sidebar.collapsed .nav-item .icon {
+            font-size: 1.5rem;
+            width: auto;
+            margin: 0;
+        }
+
+        /* 縮放狀態下活動項目的標記 */
+        .sidebar.collapsed .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 50%;
+            background: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* 縮放狀態下的 hover 效果 */
+        .sidebar.collapsed .nav-item:hover {
+            background: var(--bg-card);
+        }
+
+        /* 為導航項目添加 tooltip 效果 (可選) */
+        .sidebar.collapsed .nav-item {
+            position: relative;
+        }
+
+        .sidebar.collapsed .nav-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 70px;
+            background: var(--bg-card);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1002;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .sidebar.collapsed .nav-item:hover::after {
+            opacity: 1;
         }
 
         .sidebar-header {
@@ -387,6 +521,12 @@
             margin-left: 300px;
             padding: 2rem 3rem;
             max-width: 1200px;
+            transition: var(--transition);
+        }
+
+        /* 主要內容區域適應縮放狀態 */
+        .main-content.sidebar-collapsed {
+            margin-left: 70px;
         }
 
         /* 頂部橫幅 */
@@ -717,7 +857,7 @@
 
         /* 捲軸樣式 */
         ::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
 
         ::-webkit-scrollbar-track {
@@ -731,6 +871,20 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-dark);
+        }
+
+        /* 側邊欄專用捲軸樣式 */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(25, 118, 210, 0.5);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
         }
 
         /* 載入動畫 */
@@ -761,8 +915,13 @@
 <body>
     <!-- 側邊欄導航 -->
     <aside class="sidebar">
+        <!-- 縮放按鈕 -->
+        <div class="sidebar-toggle" onclick="sidebarManager.toggle()">
+            <i class="fas fa-chevron-left" id="toggle-icon"></i>
+        </div>
+
         <div class="sidebar-header">
-            <h1><i class="fas fa-robot"></i> Gemini CLI 教學</h1>
+            <h1><i class="fas fa-robot"></i><span class="header-text"> Gemini CLI 教學</span></h1>
             <div class="duration">
                 <i class="far fa-clock"></i>
                 <span>總時長：120 分鐘</span>
@@ -824,22 +983,22 @@
 
         <!-- 導航選單 -->
         <nav class="nav-menu" id="nav-menu">
-            <div class="nav-item" data-section="section-1">
+            <div class="nav-item" data-section="section-1" data-tooltip="基礎奠基與核心概念">
                 <i class="icon fas fa-book-open"></i>
                 <span>基礎奠基與核心概念</span>
                 <span class="duration">20 分鐘</span>
             </div>
-            <div class="nav-item" data-section="section-2">
+            <div class="nav-item" data-section="section-2" data-tooltip="活用 MCP 工具">
                 <i class="icon fas fa-puzzle-piece"></i>
                 <span>活用 MCP 工具</span>
                 <span class="duration">40 分鐘</span>
             </div>
-            <div class="nav-item" data-section="section-3">
+            <div class="nav-item" data-section="section-3" data-tooltip="字幕產生器開發">
                 <i class="icon fas fa-code"></i>
                 <span>字幕產生器開發</span>
                 <span class="duration">45 分鐘</span>
             </div>
-            <div class="nav-item" data-section="section-4">
+            <div class="nav-item" data-section="section-4" data-tooltip="未來展望與 Q&A">
                 <i class="icon fas fa-rocket"></i>
                 <span>未來展望與 Q&A</span>
                 <span class="duration">15 分鐘</span>
@@ -1243,6 +1402,73 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 
     <script>
+        /**
+         * 側邊欄管理器
+         * 負責管理側邊欄的縮放狀態
+         */
+        class SidebarManager {
+            constructor() {
+                this.storageKey = 'gemini-cli-sidebar';
+                this.sidebar = document.querySelector('.sidebar');
+                this.mainContent = document.querySelector('.main-content');
+                this.toggleIcon = document.getElementById('toggle-icon');
+                this.isCollapsed = false;
+
+                this.loadState();
+            }
+
+            /**
+             * 從 localStorage 載入側邊欄狀態
+             */
+            loadState() {
+                const savedState = localStorage.getItem(this.storageKey);
+                if (savedState === 'collapsed') {
+                    this.isCollapsed = true;
+                    this.sidebar.classList.add('collapsed');
+                    this.mainContent.classList.add('sidebar-collapsed');
+                    this.updateIcon();
+                }
+            }
+
+            /**
+             * 儲存側邊欄狀態到 localStorage
+             */
+            saveState() {
+                localStorage.setItem(this.storageKey, this.isCollapsed ? 'collapsed' : 'expanded');
+            }
+
+            /**
+             * 切換側邊欄狀態
+             */
+            toggle() {
+                this.isCollapsed = !this.isCollapsed;
+
+                if (this.isCollapsed) {
+                    this.sidebar.classList.add('collapsed');
+                    this.mainContent.classList.add('sidebar-collapsed');
+                    showNotification('側邊欄已收起', 'info');
+                } else {
+                    this.sidebar.classList.remove('collapsed');
+                    this.mainContent.classList.remove('sidebar-collapsed');
+                    showNotification('側邊欄已展開', 'info');
+                }
+
+                this.updateIcon();
+                this.saveState();
+            }
+
+            /**
+             * 更新縮放按鈕圖示
+             */
+            updateIcon() {
+                if (this.isCollapsed) {
+                    this.toggleIcon.className = 'fas fa-chevron-right';
+                } else {
+                    this.toggleIcon.className = 'fas fa-chevron-left';
+                }
+            }
+        }
+
         /**
          * 主題管理器
          * 負責管理日間/夜間模式的切換
@@ -1692,6 +1918,7 @@
         }
 
         // 初始化全局變數
+        let sidebarManager;
         let themeManager;
         let timerManager;
         let progressManager;
@@ -1772,6 +1999,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             // 初始化程式碼高亮
             Prism.highlightAll();
+
+            // 初始化側邊欄管理器
+            sidebarManager = new SidebarManager();
 
             // 初始化主題管理器
             themeManager = new ThemeManager();
