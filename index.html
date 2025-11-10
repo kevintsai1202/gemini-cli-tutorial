@@ -792,6 +792,207 @@
             border-radius: 0 8px 8px 0;
         }
 
+        /* 社群連結區塊 */
+        .social-links {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .social-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: var(--transition);
+        }
+
+        .social-avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 25px var(--shadow);
+        }
+
+        .social-links-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .social-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .social-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            color: white;
+        }
+
+        .social-link-youtube {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+        }
+
+        .social-link-youtube:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .social-link-facebook {
+            background: linear-gradient(135deg, #1877f2 0%, #0d65d9 100%);
+        }
+
+        .social-link-facebook:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(24, 119, 242, 0.4);
+        }
+
+        .social-link-threads {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+        }
+
+        .social-link-threads:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .social-link i {
+            font-size: 1.2rem;
+        }
+
+        /* 日間模式社群連結樣式 */
+        .light-mode .social-links {
+            box-shadow: 0 2px 10px var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        /* 折疊區塊樣式 */
+        .collapsible-section {
+            margin: 2rem 0;
+        }
+
+        .collapsible-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+            margin-bottom: 0.5rem;
+        }
+
+        .collapsible-header:hover {
+            background: var(--bg-darker);
+            border-color: var(--primary);
+        }
+
+        .collapsible-header-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .collapsible-header-content i {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .collapsible-header-content h4 {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .collapsible-icon {
+            font-size: 1rem;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.open {
+            max-height: 3000px;
+        }
+
+        .collapsible-body {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .collapsible-body h5 {
+            color: var(--primary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+
+        .collapsible-body h5:first-child {
+            margin-top: 0;
+        }
+
+        .collapsible-body ol, .collapsible-body ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .collapsible-body li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .collapsible-body .sop-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .collapsible-body .important-note {
+            background: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
         /* 通知提示 */
         .notification {
             position: fixed;
@@ -1029,6 +1230,28 @@
             </div>
         </section>
 
+        <!-- 社群連結 -->
+        <section class="social-links">
+            <div class="social-info">
+                <img src="圓形去背.png" alt="講師頭像" class="social-avatar">
+                <div class="social-name">凱文大叔教你寫程式</div>
+            </div>
+            <div class="social-links-wrapper">
+                <a href="https://www.youtube.com/@pg-kt?sub_confirmation=1" target="_blank" class="social-link social-link-youtube">
+                    <i class="fab fa-youtube"></i>
+                    <span>YouTube 頻道</span>
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61564137718583" target="_blank" class="social-link social-link-facebook">
+                    <i class="fab fa-facebook"></i>
+                    <span>Facebook 粉絲專頁</span>
+                </a>
+                <a href="https://www.threads.com/@cai.chengkai" target="_blank" class="social-link social-link-threads">
+                    <i class="fab fa-threads"></i>
+                    <span>Threads</span>
+                </a>
+            </div>
+        </section>
+
         <!-- 事前準備 -->
         <section class="section-card">
             <div class="section-header">
@@ -1046,6 +1269,188 @@
                     <li><strong>Node.js:</strong> 請確保已安裝 <a href="https://nodejs.org/" target="_blank" style="color: var(--primary);">Node.js</a> 22.x 或更高版本</li>
                     <li><strong>Python:</strong> 請確保已安裝 <a href="https://www.python.org/" target="_blank" style="color: var(--primary);">Python</a> 3.x 或更高版本</li>
                 </ul>
+            </div>
+
+            <!-- 安裝說明折疊區 -->
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-book"></i> 詳細安裝說明</h3>
+
+                <!-- VS Code 安裝 SOP -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <div class="collapsible-header-content">
+                            <i class="fas fa-code"></i>
+                            <h4>VS Code 安裝手冊</h4>
+                        </div>
+                        <i class="fas fa-chevron-down collapsible-icon"></i>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <h5>1. 下載 VS Code</h5>
+                            <ul>
+                                <li>前往 VS Code 官方下載頁面：<a href="https://code.visualstudio.com/download" target="_blank" style="color: var(--primary);">https://code.visualstudio.com/download</a></li>
+                                <li>根據您的作業系統，點擊對應的下載按鈕</li>
+                            </ul>
+                            <img src="SOP/vscode_downloads_page.png" alt="VS Code 下載頁面" class="sop-image">
+
+                            <h5>2. 執行安裝檔</h5>
+                            <p>下載完成後，點擊執行安裝檔 <code>VSCodeUserSetup-x64-1.105.1.exe</code></p>
+
+                            <h5>3. 同意授權合約</h5>
+                            <p>閱讀授權合約，並選擇「我同意此授權合約」，然後點擊「下一步」</p>
+
+                            <h5>4. 選擇安裝路徑</h5>
+                            <p>選擇您要安裝 VS Code 的資料夾，或使用預設路徑，然後點擊「下一步」</p>
+
+                            <h5>5. 選取其他工作</h5>
+                            <p>根據您的需求，可以選擇是否要建立桌面圖示，或將 VS Code 加入到右鍵選單中。建議全部勾選，然後點擊「下一步」</p>
+
+                            <h5>6. 確認安裝</h5>
+                            <p>確認您的安裝設定，然後點擊「安裝」</p>
+
+                            <h5>7. 完成安裝</h5>
+                            <p>等待安裝完成後，點擊「完成」即可啟動 VS Code</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node.js 安裝 SOP -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <div class="collapsible-header-content">
+                            <i class="fab fa-node-js"></i>
+                            <h4>Node.js 安裝 SOP</h4>
+                        </div>
+                        <i class="fas fa-chevron-down collapsible-icon"></i>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <h5>Windows 11 安裝</h5>
+
+                            <p><strong>步驟 1: 前往 Node.js 官方下載頁面</strong></p>
+                            <p>開啟您的網頁瀏覽器，並前往 <a href="https://nodejs.org/en/download/" target="_blank" style="color: var(--primary);">Node.js 官方下載頁面</a></p>
+
+                            <p><strong>步驟 2: 下載 Node.js 安裝程式</strong></p>
+                            <p>在頁面中，建議選擇「LTS (Long Term Support)」版本，因為它提供長期穩定支援。點擊對應Windows的下載連結（通常是 .msi 檔案）</p>
+                            <img src="SOP/nodejs_downloads_page.png" alt="Node.js 下載頁面" class="sop-image">
+
+                            <p><strong>步驟 3: 執行安裝程式</strong></p>
+                            <ol>
+                                <li>找到下載的 .msi 安裝檔案並執行</li>
+                                <li>按照安裝精靈的指示進行。通常，您可以接受所有預設選項，因為它會自動安裝 npm (Node Package Manager) 並將Node.js加入系統的 PATH 環境變數中</li>
+                                <li>等待安裝完成</li>
+                            </ol>
+
+                            <p><strong>步驟 4: 驗證安裝</strong></p>
+                            <ol>
+                                <li>開啟「命令提示字元」（Command Prompt）。您可以按下 Win + R，輸入 cmd，然後按下 Enter</li>
+                                <li>在命令提示字元中輸入以下指令並按下 Enter：
+                                    <div class="code-block-wrapper" style="margin-top: 0.5rem;">
+                                        <pre><code class="language-bash">node -v</code></pre>
+                                    </div>
+                                </li>
+                                <li>您將看到已安裝的 Node.js 版本號（例如：v22.21.0）</li>
+                                <li>接著，輸入以下指令驗證 npm 是否也成功安裝：
+                                    <div class="code-block-wrapper" style="margin-top: 0.5rem;">
+                                        <pre><code class="language-bash">npm -v</code></pre>
+                                    </div>
+                                </li>
+                                <li>您將看到已安裝的 npm 版本號</li>
+                            </ol>
+
+                            <h5>macOS 安裝</h5>
+
+                            <p><strong>方式一: 使用官方安裝程式</strong></p>
+                            <ol>
+                                <li>前往 <a href="https://nodejs.org/en/download/" target="_blank" style="color: var(--primary);">Node.js 官方下載頁面</a></li>
+                                <li>選擇「LTS (Long Term Support)」版本，點擊對應macOS的下載連結（通常是 .pkg 檔案）</li>
+                                <li>找到下載的 .pkg 安裝檔案並執行，按照指示完成安裝</li>
+                            </ol>
+
+                            <p><strong>方式二: 使用 Homebrew (推薦)</strong></p>
+                            <p>如果您已安裝 Homebrew (macOS 的套件管理器)，可以使用以下指令安裝 Node.js：</p>
+                            <ol>
+                                <li>開啟「終端機」（Terminal）</li>
+                                <li>輸入以下指令並按下 Enter：
+                                    <div class="code-block-wrapper" style="margin-top: 0.5rem;">
+                                        <pre><code class="language-bash">brew install node</code></pre>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Python 安裝 SOP -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <div class="collapsible-header-content">
+                            <i class="fab fa-python"></i>
+                            <h4>Python 安裝 SOP</h4>
+                        </div>
+                        <i class="fas fa-chevron-down collapsible-icon"></i>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <h5>Windows 11 安裝</h5>
+
+                            <p><strong>步驟 1: 前往 Python 官方下載頁面</strong></p>
+                            <p>開啟您的網頁瀏覽器，並前往 <a href="https://www.python.org/downloads/" target="_blank" style="color: var(--primary);">Python 官方下載頁面</a></p>
+
+                            <p><strong>步驟 2: 下載 Python 安裝程式</strong></p>
+                            <p>在頁面中，您會看到一個顯眼的「Download Python」按鈕。點擊此按鈕以下載適用於Windows的安裝程式</p>
+                            <img src="SOP/python_downloads_page.png" alt="Python 下載頁面" class="sop-image">
+
+                            <p><strong>步驟 3: 執行安裝程式</strong></p>
+                            <ol>
+                                <li>找到下載的 .exe 安裝檔案並執行</li>
+                                <li>
+                                    <div class="important-note">
+                                        <strong>重要：</strong> 在安裝精靈的第一個畫面，請務必勾選「<strong>Add Python X.Y to PATH</strong>」（將Python X.Y加入環境變數）。這將允許您在命令提示字元中直接執行Python
+                                    </div>
+                                </li>
+                                <li>選擇「Install Now」進行預設安裝，或選擇「Customize installation」進行自訂安裝（建議初學者使用預設安裝）</li>
+                                <li>等待安裝完成</li>
+                            </ol>
+
+                            <p><strong>步驟 4: 驗證安裝</strong></p>
+                            <ol>
+                                <li>開啟「命令提示字元」（Command Prompt）。您可以按下 Win + R，輸入 cmd，然後按下 Enter</li>
+                                <li>在命令提示字元中輸入以下指令並按下 Enter：
+                                    <div class="code-block-wrapper" style="margin-top: 0.5rem;">
+                                        <pre><code class="language-bash">python --version</code></pre>
+                                    </div>
+                                </li>
+                                <li>如果安裝成功，您將看到類似 Python 3.14.0 的版本資訊</li>
+                            </ol>
+
+                            <h5>macOS 安裝</h5>
+
+                            <p><strong>步驟 1: 前往 Python 官方下載頁面</strong></p>
+                            <p>與Windows相同，前往 <a href="https://www.python.org/downloads/" target="_blank" style="color: var(--primary);">Python 官方下載頁面</a></p>
+
+                            <p><strong>步驟 2: 下載 macOS 安裝程式</strong></p>
+                            <p>在頁面中找到「macOS」相關的下載連結（通常在「Looking for Python with a different OS?」下方）。點擊下載 .pkg 檔案</p>
+
+                            <p><strong>步驟 3: 執行安裝程式</strong></p>
+                            <ol>
+                                <li>找到下載的 .pkg 安裝檔案並執行</li>
+                                <li>按照安裝精靈的指示完成安裝</li>
+                            </ol>
+
+                            <p><strong>步驟 4: 驗證安裝</strong></p>
+                            <ol>
+                                <li>開啟「終端機」（Terminal）</li>
+                                <li>在終端機中輸入以下指令並按下 Enter：
+                                    <div class="code-block-wrapper" style="margin-top: 0.5rem;">
+                                        <pre><code class="language-bash">python3 --version</code></pre>
+                                    </div>
+                                </li>
+                                <li>如果安裝成功，您將看到類似 Python 3.14.0 的版本資訊</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -1991,6 +2396,23 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
+        }
+
+        /**
+         * 折疊區塊控制函數
+         * @param {HTMLElement} header - 折疊區塊的標題元素
+         */
+        function toggleCollapsible(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.collapsible-icon');
+
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.classList.remove('open');
+            } else {
+                content.classList.add('open');
+                icon.classList.add('open');
+            }
         }
 
         /**
