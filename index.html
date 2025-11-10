@@ -1960,6 +1960,105 @@
                 </div>
             </div>
 
+            <!-- 實作要點 -->
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-hammer"></i> 實作要點：標準開發流程</h3>
+
+                <div class="subsection-content">
+                    <p>為了確保開發過程順利且不出錯,建議按照以下五個步驟進行:</p>
+
+                    <h4><i class="fas fa-file-alt"></i> 步驟 1：將需求存為 PRD.md</h4>
+                    <div class="info-box">
+                        <strong>為什麼要這麼做？</strong>
+                        <p style="margin-top: 0.5rem;">在與 AI 對話時,如果需求較長,很容易在打字到一半時不小心按到 Enter 送出,導致需求描述不完整。將需求先寫在 Markdown 檔案中,可以:</p>
+                        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                            <li>完整且有條理地整理需求</li>
+                            <li>避免遺漏重要細節</li>
+                            <li>方便後續修改與版本控制</li>
+                        </ul>
+                    </div>
+                    <p><strong>操作提示:</strong> 建立 <code>PRD.md</code> (Product Requirements Document),將上述「字幕產生器功能需求」整理成文件格式。</p>
+
+                    <h4><i class="fas fa-clipboard-check"></i> 步驟 2：依據需求轉為詳細 spec.md</h4>
+                    <div class="warning-box">
+                        <strong>務必確認細節！</strong>
+                        <p style="margin-top: 0.5rem;">規格文件是開發的藍圖,細節越清楚,AI 生成的程式碼品質越高。spec.md 應該包含:</p>
+                        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                            <li><strong>技術架構:</strong> 使用的程式語言、框架、第三方套件</li>
+                            <li><strong>功能模組:</strong> 每個功能的詳細說明與預期行為</li>
+                            <li><strong>資料流程:</strong> 輸入、處理、輸出的完整流程</li>
+                            <li><strong>錯誤處理:</strong> 各種異常狀況的處理方式</li>
+                            <li><strong>檔案結構:</strong> 專案的目錄與檔案組織</li>
+                        </ul>
+                    </div>
+                    <p><strong>Gemini CLI 提示:</strong> 使用 <code>@PRD.md</code> 將需求文件加入上下文,然後請 Gemini 產生詳細的技術規格文件。</p>
+
+                    <h4><i class="fas fa-tasks"></i> 步驟 3：任務拆解 todolist.md</h4>
+                    <div class="info-box">
+                        <strong>化整為零,逐步擊破</strong>
+                        <p style="margin-top: 0.5rem;">將大型專案拆解成小任務有以下好處:</p>
+                        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                            <li>降低 AI 的錯誤率 (任務越小越聚焦)</li>
+                            <li>方便追蹤進度</li>
+                            <li>每個小任務完成後可以立即測試</li>
+                            <li>出錯時容易定位問題</li>
+                        </ul>
+                    </div>
+                    <p><strong>範例任務拆解:</strong></p>
+                    <ul>
+                        <li>Task 1: 建立專案結構與環境設定</li>
+                        <li>Task 2: 實作 YouTube 影片下載功能</li>
+                        <li>Task 3: 實作音訊轉換功能 (ffmpeg)</li>
+                        <li>Task 4: 實作 Whisper API 呼叫與逐字稿生成</li>
+                        <li>Task 5: 實作 SRT 字幕檔生成</li>
+                        <li>Task 6: 實作摘要與社群貼文生成</li>
+                        <li>Task 7: 整合測試與錯誤處理</li>
+                    </ul>
+
+                    <h4><i class="fas fa-code"></i> 步驟 4：開始實作</h4>
+                    <div class="success-box">
+                        <strong>重要原則：完成一個任務,更新一次 todolist.md</strong>
+                        <p style="margin-top: 0.5rem;">每完成一個子任務後:</p>
+                        <ol style="margin-top: 0.5rem; margin-bottom: 0;">
+                            <li>請 AI 更新 <code>todolist.md</code>,標記該任務為已完成</li>
+                            <li>簡單測試該功能是否正常運作</li>
+                            <li>確認無誤後再進行下一個任務</li>
+                            <li>如果發現問題,立即請 AI 修復後再繼續</li>
+                        </ol>
+                    </div>
+                    <p><strong>開發技巧:</strong></p>
+                    <ul>
+                        <li>使用 <code>@spec.md</code> 和 <code>@todolist.md</code> 保持 AI 對專案的理解</li>
+                        <li>每個任務都要求 AI 加上詳細的中文註解</li>
+                        <li>適時要求 AI 進行 Code Review</li>
+                    </ul>
+
+                    <h4><i class="fas fa-check-double"></i> 步驟 5：測試驗收</h4>
+                    <div class="info-box">
+                        <strong>完整測試清單</strong>
+                        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                            <li><strong>功能測試:</strong> 每個功能是否符合需求</li>
+                            <li><strong>邊界測試:</strong> 輸入無效 URL、網路斷線等異常情況</li>
+                            <li><strong>效能測試:</strong> 處理長影片時的效能表現</li>
+                            <li><strong>使用者體驗:</strong> 錯誤訊息是否清楚、操作是否直覺</li>
+                        </ul>
+                    </div>
+                    <p><strong>驗收標準:</strong> 確保程式能夠:</p>
+                    <ul>
+                        <li>✅ 成功下載 YouTube 影片並轉換為音訊</li>
+                        <li>✅ 正確呼叫 Whisper API 並獲得逐字稿</li>
+                        <li>✅ 生成格式正確的 SRT 字幕檔</li>
+                        <li>✅ 產生準確的內容摘要</li>
+                        <li>✅ 適當處理各種錯誤情況</li>
+                    </ul>
+
+                    <div class="success-box">
+                        <strong><i class="fas fa-lightbulb"></i> 專業提示:</strong>
+                        <p style="margin-top: 0.5rem;">在整個開發過程中,建議使用 Git 進行版本控制。每完成一個主要任務就 commit 一次,這樣如果遇到問題,可以輕鬆回到之前的穩定版本。</p>
+                    </div>
+                </div>
+            </div>
+
             <button class="complete-btn" onclick="markComplete('section-3')">
                 <i class="fas fa-check"></i>
                 <span>標記為已完成</span>
