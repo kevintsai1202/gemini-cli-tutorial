@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <style>
-        /* ===== CSS 變數定義 ===== */
+        /* ===== CSS 變數定義 (深色模式) ===== */
         :root {
             --primary: #1976d2;
             --primary-dark: #1565c0;
@@ -29,6 +29,25 @@
             --code-bg: #2d2d2d;
             --border-color: #3a3a5c;
             --shadow: rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== CSS 變數定義 (日間模式) ===== */
+        :root.light-mode {
+            --primary: #1976d2;
+            --primary-dark: #1565c0;
+            --secondary: #616161;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --bg-dark: #f5f5f5;
+            --bg-darker: #ffffff;
+            --bg-card: #ffffff;
+            --text-light: #212121;
+            --text-muted: #757575;
+            --code-bg: #f5f5f5;
+            --border-color: #e0e0e0;
+            --shadow: rgba(0, 0, 0, 0.1);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -203,6 +222,56 @@
             color: var(--primary);
             font-weight: 600;
             font-size: 1rem;
+        }
+
+        /* 主題切換按鈕 */
+        .theme-toggle {
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .theme-toggle-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .theme-icon {
+            font-size: 1.1rem;
+        }
+
+        /* 日間模式特定樣式調整 */
+        .light-mode .sidebar {
+            box-shadow: 2px 0 10px var(--shadow);
+        }
+
+        .light-mode .section-card {
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .light-mode .hero-section {
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .light-mode pre {
+            border: 1px solid var(--border-color);
         }
 
         .progress-label {
@@ -705,6 +774,14 @@
             </div>
         </div>
 
+        <!-- 主題切換 -->
+        <div class="theme-toggle">
+            <button class="theme-toggle-btn" id="theme-toggle" onclick="themeManager.toggle()">
+                <i class="theme-icon fas fa-sun" id="theme-icon"></i>
+                <span id="theme-text">切換日間模式</span>
+            </button>
+        </div>
+
         <!-- 導航選單 -->
         <nav class="nav-menu" id="nav-menu">
             <div class="nav-item" data-section="section-1">
@@ -1118,6 +1195,73 @@ gemini</code></pre>
 
     <script>
         /**
+         * 主題管理器
+         * 負責管理日間/夜間模式的切換
+         */
+        class ThemeManager {
+            constructor() {
+                this.storageKey = 'gemini-cli-theme';
+                this.themeIcon = document.getElementById('theme-icon');
+                this.themeText = document.getElementById('theme-text');
+                this.currentTheme = 'dark'; // 預設深色模式
+
+                this.loadTheme();
+            }
+
+            /**
+             * 從 localStorage 載入主題設定
+             */
+            loadTheme() {
+                const savedTheme = localStorage.getItem(this.storageKey);
+                if (savedTheme) {
+                    this.currentTheme = savedTheme;
+                    if (this.currentTheme === 'light') {
+                        document.documentElement.classList.add('light-mode');
+                    }
+                }
+                this.updateUI();
+            }
+
+            /**
+             * 儲存主題設定到 localStorage
+             */
+            saveTheme() {
+                localStorage.setItem(this.storageKey, this.currentTheme);
+            }
+
+            /**
+             * 切換主題
+             */
+            toggle() {
+                if (this.currentTheme === 'dark') {
+                    this.currentTheme = 'light';
+                    document.documentElement.classList.add('light-mode');
+                    showNotification('已切換至日間模式', 'success');
+                } else {
+                    this.currentTheme = 'dark';
+                    document.documentElement.classList.remove('light-mode');
+                    showNotification('已切換至夜間模式', 'success');
+                }
+
+                this.saveTheme();
+                this.updateUI();
+            }
+
+            /**
+             * 更新 UI 顯示
+             */
+            updateUI() {
+                if (this.currentTheme === 'light') {
+                    this.themeIcon.className = 'theme-icon fas fa-moon';
+                    this.themeText.textContent = '切換夜間模式';
+                } else {
+                    this.themeIcon.className = 'theme-icon fas fa-sun';
+                    this.themeText.textContent = '切換日間模式';
+                }
+            }
+        }
+
+        /**
          * 計時器管理器
          * 負責管理學習時間的計時與統計
          */
@@ -1499,6 +1643,7 @@ gemini</code></pre>
         }
 
         // 初始化全局變數
+        let themeManager;
         let timerManager;
         let progressManager;
         let navigationController;
@@ -1578,6 +1723,9 @@ gemini</code></pre>
         document.addEventListener('DOMContentLoaded', () => {
             // 初始化程式碼高亮
             Prism.highlightAll();
+
+            // 初始化主題管理器
+            themeManager = new ThemeManager();
 
             // 初始化計時器管理器
             timerManager = new TimerManager();
