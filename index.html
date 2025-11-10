@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用 AI 幫你寫程式！Gemini CLI 完全教學</title>
+
+    <!-- Prism.js 程式碼高亮 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome 圖標 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        /* ===== CSS 變數定義 ===== */
+        :root {
+            --primary: #1976d2;
+            --primary-dark: #1565c0;
+            --secondary: #424242;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --bg-dark: #1a1a2e;
+            --bg-darker: #0f0f1e;
+            --bg-card: #252547;
+            --text-light: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --code-bg: #2d2d2d;
+            --border-color: #3a3a5c;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== 全局樣式 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== 容器佈局 ===== */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== 側邊欄樣式 ===== */
+        .sidebar {
+            width: 300px;
+            background: var(--bg-darker);
+            border-right: 2px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-header .duration {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* 進度條 */
+        .progress-container {
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 計時器容器 */
+        .timer-container {
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .timer-display {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .timer-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .timer-time {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .timer-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .timer-btn-start {
+            background: var(--success);
+            color: white;
+        }
+
+        .timer-btn-start:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .timer-btn-pause {
+            background: var(--warning);
+            color: white;
+        }
+
+        .timer-btn-pause:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+        }
+
+        .timer-btn-reset {
+            background: var(--danger);
+            color: white;
+        }
+
+        .timer-btn-reset:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        .timer-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .timer-btn:disabled:hover {
+            transform: none;
+        }
+
+        .timer-stats {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .timer-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timer-stat-label {
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .timer-stat-value {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, #66bb6a 100%);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        /* 導航選單 */
+        .nav-menu {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-card);
+            border-left-color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-card);
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-item.completed {
+            opacity: 0.7;
+        }
+
+        .nav-item .icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item .duration {
+            margin-left: auto;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== 主要內容區域 ===== */
+        .main-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 2rem 3rem;
+            max-width: 1200px;
+        }
+
+        /* 頂部橫幅 */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 40px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .highlight-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .highlight-item i {
+            font-size: 1.5rem;
+            color: var(--warning);
+        }
+
+        /* 章節卡片 */
+        .section-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .section-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .section-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* 子章節 */
+        .subsection {
+            margin: 1.5rem 0;
+        }
+
+        .subsection-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .subsection-content {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        .subsection-content p {
+            margin-bottom: 1rem;
+        }
+
+        .subsection-content ul,
+        .subsection-content ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .subsection-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .subsection-content strong {
+            color: var(--primary);
+        }
+
+        /* 程式碼區塊 */
+        .code-block-wrapper {
+            position: relative;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .code-header {
+            background: var(--bg-darker);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-language {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        pre {
+            margin: 0;
+            background: var(--code-bg) !important;
+            padding: 1.5rem !important;
+            overflow-x: auto;
+        }
+
+        pre code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* 完成按鈕 */
+        .complete-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            transition: var(--transition);
+        }
+
+        .complete-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .complete-btn.completed {
+            background: var(--text-muted);
+            cursor: default;
+        }
+
+        .complete-btn.completed:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 提示框 */
+        .info-box {
+            background: rgba(25, 118, 210, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .success-box {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 通知提示 */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .notification.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .hero-section {
+                padding: 2rem;
+            }
+
+            .hero-section h1 {
+                font-size: 1.8rem;
+            }
+
+            .section-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* 捲軸樣式 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* 載入動畫 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 1.5rem;
+        }
+
+        .spinner {
+            border: 4px solid var(--bg-card);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄導航 -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1><i class="fas fa-robot"></i> Gemini CLI 教學</h1>
+            <div class="duration">
+                <i class="far fa-clock"></i>
+                <span>總時長：120 分鐘</span>
+            </div>
+        </div>
+
+        <!-- 學習進度 -->
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>學習進度</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- 計時器 -->
+        <div class="timer-container">
+            <div class="timer-display">
+                <div class="timer-label">學習計時</div>
+                <div class="timer-time" id="timer-display">00:00:00</div>
+            </div>
+
+            <div class="timer-controls">
+                <button class="timer-btn timer-btn-start" id="timer-start" onclick="timerManager.start()">
+                    <i class="fas fa-play"></i>
+                    <span>開始</span>
+                </button>
+                <button class="timer-btn timer-btn-pause" id="timer-pause" onclick="timerManager.pause()" disabled>
+                    <i class="fas fa-pause"></i>
+                    <span>暫停</span>
+                </button>
+                <button class="timer-btn timer-btn-reset" id="timer-reset" onclick="timerManager.reset()">
+                    <i class="fas fa-redo"></i>
+                    <span>重置</span>
+                </button>
+            </div>
+
+            <div class="timer-stats">
+                <div class="timer-stat">
+                    <span class="timer-stat-label">今日學習</span>
+                    <span class="timer-stat-value" id="today-time">00:00:00</span>
+                </div>
+                <div class="timer-stat">
+                    <span class="timer-stat-label">總學習時間</span>
+                    <span class="timer-stat-value" id="total-time">00:00:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 導航選單 -->
+        <nav class="nav-menu" id="nav-menu">
+            <div class="nav-item" data-section="section-1">
+                <i class="icon fas fa-book-open"></i>
+                <span>基礎奠基與核心概念</span>
+                <span class="duration">20 分鐘</span>
+            </div>
+            <div class="nav-item" data-section="section-2">
+                <i class="icon fas fa-puzzle-piece"></i>
+                <span>活用 MCP 工具</span>
+                <span class="duration">40 分鐘</span>
+            </div>
+            <div class="nav-item" data-section="section-3">
+                <i class="icon fas fa-code"></i>
+                <span>字幕產生器開發</span>
+                <span class="duration">45 分鐘</span>
+            </div>
+            <div class="nav-item" data-section="section-4">
+                <i class="icon fas fa-rocket"></i>
+                <span>未來展望與 Q&A</span>
+                <span class="duration">15 分鐘</span>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- 主要內容 -->
+    <main class="main-content" id="main-content">
+        <!-- 頂部橫幅 -->
+        <section class="hero-section">
+            <h1>用 AI 幫你寫程式！學會 Gemini CLI 打造 4 大超實用自動化流程</h1>
+            <p class="subtitle">2 小時掌握 AI 驅動的開發工作流程</p>
+
+            <div class="hero-highlights">
+                <div class="highlight-item">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>應用程式化思維</span>
+                </div>
+                <div class="highlight-item">
+                    <i class="fas fa-rocket"></i>
+                    <span>原型驅動開發</span>
+                </div>
+                <div class="highlight-item">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <span>跨工具整合</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 事前準備 -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    事前準備
+                </h2>
+            </div>
+
+            <div class="subsection">
+                <p>開始課程前,請確保您已安裝以下工具:</p>
+
+                <ul>
+                    <li><strong>VS Code:</strong> 請確保已安裝 <a href="https://code.visualstudio.com/Download" target="_blank" style="color: var(--primary);">VS Code</a> 最新 1.105 版</li>
+                    <li><strong>Node.js:</strong> 請確保已安裝 <a href="https://nodejs.org/" target="_blank" style="color: var(--primary);">Node.js</a> 22.x 或更高版本</li>
+                    <li><strong>Python:</strong> 請確保已安裝 <a href="https://www.python.org/" target="_blank" style="color: var(--primary);">Python</a> 3.x 或更高版本</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第一部分 -->
+        <section class="section-card" id="section-1">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-book-open"></i>
+                    第一部分：基礎奠基與核心概念
+                </h2>
+                <div class="section-meta">
+                    <span><i class="far fa-clock"></i> 20 分鐘</span>
+                </div>
+            </div>
+
+            <!-- 歡迎與介紹 -->
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-hand-wave"></i> 歡迎與介紹 (5 分鐘)</h3>
+
+                <div class="subsection-content">
+                    <h4>為什麼要學 Gemini CLI？</h4>
+                    <p>在傳統的開發模式中,我們需要手動編寫每一行程式碼。然而,隨著 AI 技術的發展,我們可以將許多重複性、規律性的工作交給 AI 處理。Gemini CLI 不僅僅是一個 AI 助理,它更像是一位全自動的開發夥伴,能夠理解您的意圖,並自動執行複雜的任務,從而極大地提升您的開發效率。</p>
+
+                    <h4>成果展示</h4>
+                    <p>在本課程中,我們將會完成以下幾個小專案:</p>
+                    <ol>
+                        <li><strong>自動更新腳本:</strong> 使用 Gemini CLI 撰寫一個能夠自動更新 CLI 環境的批次腳本</li>
+                        <li><strong>頻道分析報告:</strong> 自動蒐集指定 YouTube 頻道的資訊,找出相似的頻道進行比較,並最終產出詳細的比較報告</li>
+                        <li><strong>YT 影片字幕產生器:</strong> 提供一個 YouTube 影片連結,Gemini CLI 將自動轉換為字幕檔並生成影片摘要</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 環境建置 -->
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-tools"></i> 環境建置：你的第一個 Gemini 指令 (15 分鐘)</h3>
+
+                <div class="subsection-content">
+                    <h4>「萬能工具箱」概念</h4>
+                    <p>我們可以將 Gemini CLI 想像成我們開發工作流程的「大腦」,它負責思考、規劃和指揮。然而,要完成實際的任務,我們還需要「手」和「腳」,也就是各種專業的工具。本次課程中,我們將重點介紹以下幾款如同瑞士刀般強大的工具:</p>
+
+                    <ul>
+                        <li><strong>Gemini CLI:</strong> 我們的大腦,負責與 AI 溝通</li>
+                        <li><strong>pandoc:</strong> 一款強大的文件轉換工具,可以將檔案在不同格式之間進行轉換</li>
+                        <li><strong>ffmpeg:</strong> 一款開源的影音處理工具,可以進行轉檔、剪輯、擷取音訊等操作</li>
+                    </ul>
+
+                    <h4>安裝步驟</h4>
+
+                    <div class="info-box">
+                        <strong>1. Gemini CLI 安裝</strong>
+                    </div>
+                    <p><strong>前提:</strong> 需先安裝 NodeJS 20 或更高版本</p>
+
+                    <div class="code-block-wrapper">
+                        <div class="code-header">
+                            <span class="code-language">bash</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="far fa-copy"></i>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="line-numbers"><code class="language-bash">npm install -g @google/gemini-cli
+gemini</code></pre>
+                    </div>
+                    <p>首次啟動請跟隨指示,使用 Google 帳號登入以完成驗證。</p>
+
+                    <div class="info-box">
+                        <strong>2. Pandoc 安裝與介紹</strong>
+                    </div>
+                    <p><strong>介紹:</strong> 一個強大的「文件格式轉換神器」,能處理 Markdown, HTML, DOCX 等數十種格式之間的轉換。</p>
+                    <p><strong>安裝:</strong> 前往 <a href="https://pandoc.org/installing.html" target="_blank" style="color: var(--primary);">Pandoc 官網</a> 下載並安裝。</p>
+
+                    <div class="info-box">
+                        <strong>3. FFmpeg 安裝與介紹</strong>
+                    </div>
+                    <p><strong>介紹:</strong> 開源的影音處理工具,能進行轉檔、剪輯、擷取音訊等操作。是我們處理 YouTube 影片的關鍵。</p>
+                    <p><strong>安裝:</strong> 前往 <a href="https://ffmpeg.org/download.html" target="_blank" style="color: var(--primary);">FFmpeg 官網</a> 下載,並將其 <code>bin</code> 目錄加到您的系統環境變數 <code>PATH</code> 中。</p>
+                </div>
+            </div>
+
+            <!-- 無頭模式 -->
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-terminal"></i> 無頭模式：與 Gemini 高效對話 (5 分鐘)</h3>
+
+                <div class="subsection-content">
+                    <ul>
+                        <li><strong>基本 Prompt:</strong> 直接在終端機輸入您想對 Gemini 說的話</li>
+                    </ul>
+
+                    <div class="code-block-wrapper">
+                        <div class="code-header">
+                            <span class="code-language">bash</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="far fa-copy"></i>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="line-numbers"><code class="language-bash">gemini "你好嗎？"</code></pre>
+                    </div>
+
+                    <ul>
+                        <li><strong>管道 (|):</strong> 此符號可將前一個指令的結果當作下一個指令的輸入,可將 Shell 指令的輸出直接傳給 Gemini,或將檔案內容作為輸入</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Gemini對話參數 -->
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-comments"></i> Gemini 對話參數</h3>
+
+                <div class="subsection-content">
+                    <p>更深入的對話則須進入 Gemini CLI 與 AI 進行對話,以下是常用的操作:</p>
+                    <ul>
+                        <li><strong>指令 (/):</strong> 執行內建指令,輸入 "/help" 可列出所有指令</li>
+                        <li><strong>Shell Mode (!):</strong> 執行 Shell 指令,無須退出對話,Gemini 可直接讀取結果</li>
+                        <li><strong>添加上下文 (@):</strong> 讓 Gemini 讀取檔案或目錄,這是進行程式碼分析和生成的基礎</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Gemini熱鍵 -->
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-keyboard"></i> Gemini 熱鍵</h3>
+
+                <div class="subsection-content">
+                    <ul>
+                        <li><strong>Ctrl+C:</strong> 退出 Gemini</li>
+                        <li><strong>Ctrl+Y:</strong> Yolo Mode,所有指令都不再過問</li>
+                        <li><strong>Esc:</strong> 中斷操作</li>
+                        <li><strong>Shift+Tab:</strong> 自動同意編輯</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="markComplete('section-1')">
+                <i class="fas fa-check"></i>
+                <span>標記為已完成</span>
+            </button>
+        </section>
+
+        <!-- 第二部分 -->
+        <section class="section-card" id="section-2">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-puzzle-piece"></i>
+                    第二部分：活用 MCP 工具
+                </h2>
+                <div class="section-meta">
+                    <span><i class="far fa-clock"></i> 40 分鐘</span>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-download"></i> 安裝 MCP 工具</h3>
+
+                <div class="subsection-content">
+                    <ul>
+                        <li><strong>介紹 MCP (Model Context Protocol):</strong> 一種讓 LLM 擴充功能的協議,透過簡單的安裝讓 Gemini 能直接調用工具,甚至能控制瀏覽器</li>
+                        <li><strong>展示:</strong> 探索 <a href="https://geminicli.com" target="_blank" style="color: var(--primary);">geminicli.com</a> 官方提供的擴充功能生態系</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <strong>安裝 Chrome Devtools Extension</strong>
+                    </div>
+
+                    <div class="code-block-wrapper">
+                        <div class="code-header">
+                            <span class="code-language">bash</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="far fa-copy"></i>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="line-numbers"><code class="language-bash">gemini extensions install https://github.com/gemini-cli-extensions/chrome-devtools</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-laptop-code"></i> 實作：工具整合應用</h3>
+
+                <div class="subsection-content">
+                    <p>您可以透過自然的語言提示詞來控制 MCP。例如,您可以要求 Gemini:</p>
+                    <ul>
+                        <li>「打開 YouTube 網站」</li>
+                        <li>「在搜尋框中輸入『Gemini CLI』並按下 Enter」</li>
+                        <li>「擷取目前頁面的所有標題和連結」</li>
+                    </ul>
+
+                    <h4>1. 使用 MCP 蒐集頻道資訊</h4>
+                    <p>學習如何透過提示詞,引導 Gemini 開啟 Chrome、導航至 YouTube 頻道頁面、並抓取頁面上的數據。</p>
+                    <div class="success-box">
+                        <strong>目標:</strong> 取得頻道名稱、訂閱數、影片列表等資訊
+                    </div>
+
+                    <h4>2. 找出相似頻道並產出報告</h4>
+                    <ul>
+                        <li>讓 Gemini 根據蒐集到的資訊,使用 Google 搜尋找出風格或主題相似的其他頻道</li>
+                        <li>重複上一步驟,抓取這些相似頻道的數據</li>
+                        <li>將所有數據整理成 Markdown 表格,並使用 Pandoc 將其轉換為一個精美的 HTML 網頁報告</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="markComplete('section-2')">
+                <i class="fas fa-check"></i>
+                <span>標記為已完成</span>
+            </button>
+        </section>
+
+        <!-- 第三部分 -->
+        <section class="section-card" id="section-3">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-code"></i>
+                    第三部分：結合 ffmpeg、whisper 開發字幕產生器
+                </h2>
+                <div class="section-meta">
+                    <span><i class="far fa-clock"></i> 45 分鐘</span>
+                </div>
+            </div>
+
+            <div class="subsection-content">
+                <p>本章節是課程的精華,我們將透過 Gemini CLI,以「Vibe Coding」的方式開發一個 YouTube 影片字幕產生器。</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-clipboard-list"></i> 準備工作</h3>
+
+                <div class="subsection-content">
+                    <h4>取得 Groq API Key</h4>
+                    <ul>
+                        <li>前往 <a href="https://console.groq.com/keys" target="_blank" style="color: var(--primary);">GroqCloud</a> 註冊並取得免費的 API 金鑰</li>
+                        <li>Groq 提供了高效的 Whisper-large-v3 模型 API,非常適合用於語音轉文字</li>
+                        <li>將 API 金鑰設定為環境變數 (.env),以便在腳本中安全地使用</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-project-diagram"></i> 開發流程</h3>
+
+                <div class="subsection-content">
+                    <ol>
+                        <li><strong>需求描述:</strong> 詳細描述程式要達到的功能,若此時能明確指定開發語言以及使用的工具,可省略下一個步驟</li>
+                        <li><strong>調查及分析:</strong> 讓 AI 依據需求,透過網路查詢提供可行性方案,並要求提供各方案的完整分析</li>
+                        <li><strong>確認方案並請 AI 製作詳細規格文件:</strong> 決定方案,讓 AI 製作詳細的規格文件</li>
+                        <li><strong>依據規格文件將任務進行拆解:</strong> 若任務太龐大,AI 會容易失焦,錯誤率也會更高,可將需求拆解成小任務,依序完成,能大大提升成功機率</li>
+                        <li><strong>依據任務逐項開發:</strong> 所有資料準備齊全後就可進行開發,如果想得到更好的程式品質,可要求 AI 在完成小任務後都進行 Review,確認程式碼內容是沒問題的</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-list-check"></i> 字幕產生器功能需求</h3>
+
+                <div class="subsection-content">
+                    <ol>
+                        <li><strong>開發工具要求:</strong> 以 <code>Python</code> 進行開發</li>
+                        <li><strong>接收 YouTube 連結:</strong> 程式腳本需接收使用者輸入的影片 URL</li>
+                        <li><strong>擷取影片並轉換為音檔:</strong>
+                            <ul>
+                                <li>使用 <code>yt-dlp</code> (一個常用的 YouTube 下載工具) 或類似工具下載影片</li>
+                                <li>呼叫 <code>ffmpeg</code>,將下載的影片轉換為 <code>.mp3</code> 格式的音訊檔。這可以有效縮小檔案大小,避免超過 API 的上傳限制</li>
+                            </ul>
+                        </li>
+                        <li><strong>透過 Whisper API 轉換逐字稿:</strong>
+                            <ul>
+                                <li>使用 <code>Groq</code> 的 <code>Whisper-large-v3</code> 模型</li>
+                                <li>將上一步產生的 <code>.mp3</code> 音訊檔透過 API 產生完整的逐字稿 (JSON 格式)</li>
+                            </ul>
+                        </li>
+                        <li><strong>生成 SRT 字幕檔:</strong> 將上一步的逐字稿轉換為標準的 <code>.srt</code> 字幕格式</li>
+                        <li><strong>創意延伸:</strong>
+                            <ul>
+                                <li><strong>影片摘要:</strong> 將逐字稿餵給 Gemini,要求它生成 300 字的內容摘要</li>
+                                <li><strong>社群貼文:</strong> 要求 Gemini 根據摘要,產生一篇適合發布在 Facebook 或 X (Twitter) 上的推廣貼文</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="markComplete('section-3')">
+                <i class="fas fa-check"></i>
+                <span>標記為已完成</span>
+            </button>
+        </section>
+
+        <!-- 第四部分 -->
+        <section class="section-card" id="section-4">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-rocket"></i>
+                    第四部分：Vibe Coding 的迷失與未來展望
+                </h2>
+                <div class="section-meta">
+                    <span><i class="far fa-clock"></i> 15 分鐘</span>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-question-circle"></i> 不懂程式也能 Vibe Coding? (5分鐘)</h3>
+
+                <div class="subsection-content">
+                    <p>「Vibe Coding」的核心在於「溝通」和「整合」。即使您不是專業的程式設計師,只要您能清晰地描述您的需求,並了解如何組合不同的工具,您一樣可以透過 Gemini CLI 來打造出強大的應用程式。</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-star"></i> AI 未來發展 (5分鐘)</h3>
+
+                <div class="subsection-content">
+                    <p>AI 技術正在快速發展,未來將會有更多強大的工具和模型出現。學習如何與 AI 協作,將是未來開發者不可或缺的核心競爭力。</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-comments"></i> Q&A (5 分鐘)</h3>
+
+                <div class="subsection-content">
+                    <p>鼓勵學員將今天學到的方法應用到解決自己工作中的重複性問題,分享彼此的想法和挑戰。</p>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="markComplete('section-4')">
+                <i class="fas fa-check"></i>
+                <span>標記為已完成</span>
+            </button>
+        </section>
+    </main>
+
+    <!-- 通知提示 -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">操作成功!</span>
+    </div>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+    <script>
+        /**
+         * 計時器管理器
+         * 負責管理學習時間的計時與統計
+         */
+        class TimerManager {
+            constructor() {
+                this.storageKey = 'gemini-cli-timer';
+                this.isRunning = false;
+                this.elapsedSeconds = 0;
+                this.todaySeconds = 0;
+                this.totalSeconds = 0;
+                this.startTime = null;
+                this.interval = null;
+
+                // DOM 元素
+                this.displayElement = document.getElementById('timer-display');
+                this.todayElement = document.getElementById('today-time');
+                this.totalElement = document.getElementById('total-time');
+                this.startBtn = document.getElementById('timer-start');
+                this.pauseBtn = document.getElementById('timer-pause');
+                this.resetBtn = document.getElementById('timer-reset');
+
+                this.loadTimer();
+                this.updateDisplay();
+            }
+
+            /**
+             * 從 localStorage 載入計時器資料
+             */
+            loadTimer() {
+                const data = localStorage.getItem(this.storageKey);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        this.totalSeconds = parsed.totalSeconds || 0;
+
+                        // 檢查是否為今天的資料
+                        const today = new Date().toDateString();
+                        if (parsed.date === today) {
+                            this.todaySeconds = parsed.todaySeconds || 0;
+                        } else {
+                            this.todaySeconds = 0;
+                        }
+                    } catch (e) {
+                        console.error('載入計時器資料失敗:', e);
+                    }
+                }
+            }
+
+            /**
+             * 儲存計時器資料到 localStorage
+             */
+            saveTimer() {
+                const data = {
+                    todaySeconds: this.todaySeconds,
+                    totalSeconds: this.totalSeconds,
+                    date: new Date().toDateString(),
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(this.storageKey, JSON.stringify(data));
+            }
+
+            /**
+             * 將秒數轉換為 HH:MM:SS 格式
+             * @param {number} seconds - 總秒數
+             * @returns {string} 格式化的時間字串
+             */
+            formatTime(seconds) {
+                const h = Math.floor(seconds / 3600);
+                const m = Math.floor((seconds % 3600) / 60);
+                const s = seconds % 60;
+
+                return [h, m, s]
+                    .map(v => v.toString().padStart(2, '0'))
+                    .join(':');
+            }
+
+            /**
+             * 更新計時器顯示
+             */
+            updateDisplay() {
+                if (this.displayElement) {
+                    this.displayElement.textContent = this.formatTime(this.elapsedSeconds);
+                }
+                if (this.todayElement) {
+                    this.todayElement.textContent = this.formatTime(this.todaySeconds);
+                }
+                if (this.totalElement) {
+                    this.totalElement.textContent = this.formatTime(this.totalSeconds);
+                }
+            }
+
+            /**
+             * 更新按鈕狀態
+             */
+            updateButtons() {
+                if (this.isRunning) {
+                    this.startBtn.disabled = true;
+                    this.pauseBtn.disabled = false;
+                    this.startBtn.innerHTML = '<i class="fas fa-play"></i><span>開始</span>';
+                } else {
+                    this.startBtn.disabled = false;
+                    this.pauseBtn.disabled = true;
+                    if (this.elapsedSeconds > 0) {
+                        this.startBtn.innerHTML = '<i class="fas fa-play"></i><span>繼續</span>';
+                    } else {
+                        this.startBtn.innerHTML = '<i class="fas fa-play"></i><span>開始</span>';
+                    }
+                }
+            }
+
+            /**
+             * 開始計時
+             */
+            start() {
+                if (this.isRunning) return;
+
+                this.isRunning = true;
+                this.startTime = Date.now() - (this.elapsedSeconds * 1000);
+
+                this.interval = setInterval(() => {
+                    this.elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+                    this.updateDisplay();
+                }, 1000);
+
+                this.updateButtons();
+                showNotification('計時器已啟動', 'success');
+            }
+
+            /**
+             * 暫停計時
+             */
+            pause() {
+                if (!this.isRunning) return;
+
+                this.isRunning = false;
+                if (this.interval) {
+                    clearInterval(this.interval);
+                    this.interval = null;
+                }
+
+                // 累加到今日和總時長
+                this.todaySeconds += this.elapsedSeconds;
+                this.totalSeconds += this.elapsedSeconds;
+                this.elapsedSeconds = 0;
+
+                this.saveTimer();
+                this.updateDisplay();
+                this.updateButtons();
+                showNotification('計時器已暫停', 'info');
+            }
+
+            /**
+             * 重置計時器
+             */
+            reset() {
+                // 先暫停
+                if (this.isRunning) {
+                    this.pause();
+                }
+
+                // 重置當前計時
+                this.elapsedSeconds = 0;
+
+                this.updateDisplay();
+                this.updateButtons();
+                showNotification('計時器已重置', 'info');
+            }
+
+            /**
+             * 清除所有統計資料
+             */
+            clearAll() {
+                this.pause();
+                this.elapsedSeconds = 0;
+                this.todaySeconds = 0;
+                this.totalSeconds = 0;
+
+                localStorage.removeItem(this.storageKey);
+                this.updateDisplay();
+                this.updateButtons();
+                showNotification('所有計時資料已清除', 'info');
+            }
+        }
+
+        /**
+         * 進度管理器
+         * 負責管理學習進度的儲存與讀取
+         */
+        class ProgressManager {
+            constructor() {
+                this.storageKey = 'gemini-cli-progress';
+                this.completedSections = new Set();
+                this.loadProgress();
+            }
+
+            /**
+             * 從 localStorage 載入進度
+             */
+            loadProgress() {
+                const data = localStorage.getItem(this.storageKey);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        this.completedSections = new Set(parsed.completed || []);
+                    } catch (e) {
+                        console.error('載入進度失敗:', e);
+                    }
+                }
+            }
+
+            /**
+             * 儲存進度到 localStorage
+             */
+            saveProgress() {
+                const data = {
+                    completed: Array.from(this.completedSections),
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(this.storageKey, JSON.stringify(data));
+            }
+
+            /**
+             * 標記章節為已完成
+             * @param {string} sectionId - 章節 ID
+             */
+            markComplete(sectionId) {
+                this.completedSections.add(sectionId);
+                this.saveProgress();
+                this.updateUI();
+            }
+
+            /**
+             * 取消完成標記
+             * @param {string} sectionId - 章節 ID
+             */
+            unmarkComplete(sectionId) {
+                this.completedSections.delete(sectionId);
+                this.saveProgress();
+                this.updateUI();
+            }
+
+            /**
+             * 檢查章節是否已完成
+             * @param {string} sectionId - 章節 ID
+             * @returns {boolean}
+             */
+            isComplete(sectionId) {
+                return this.completedSections.has(sectionId);
+            }
+
+            /**
+             * 計算完成百分比
+             * @returns {number}
+             */
+            getProgress() {
+                const total = 4; // 總共 4 個章節
+                const completed = this.completedSections.size;
+                return Math.round((completed / total) * 100);
+            }
+
+            /**
+             * 更新 UI 顯示
+             */
+            updateUI() {
+                const progress = this.getProgress();
+                const progressFill = document.getElementById('progress-fill');
+                const progressText = document.getElementById('progress-text');
+
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
+
+                // 更新導航項目狀態
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    const sectionId = item.dataset.section;
+                    if (this.isComplete(sectionId)) {
+                        item.classList.add('completed');
+                    } else {
+                        item.classList.remove('completed');
+                    }
+                });
+
+                // 更新完成按鈕
+                document.querySelectorAll('.complete-btn').forEach(btn => {
+                    const section = btn.closest('.section-card');
+                    if (section) {
+                        const sectionId = section.id;
+                        if (this.isComplete(sectionId)) {
+                            btn.classList.add('completed');
+                            btn.innerHTML = '<i class="fas fa-check-circle"></i><span>已完成</span>';
+                        } else {
+                            btn.classList.remove('completed');
+                            btn.innerHTML = '<i class="fas fa-check"></i><span>標記為已完成</span>';
+                        }
+                    }
+                });
+
+                // 如果完成所有章節
+                if (progress === 100) {
+                    showNotification('恭喜!您已完成所有課程內容!', 'success');
+                }
+            }
+        }
+
+        /**
+         * 導航控制器
+         * 負責處理側邊欄導航與章節捲動
+         */
+        class NavigationController {
+            constructor() {
+                this.sections = document.querySelectorAll('.section-card[id]');
+                this.navItems = document.querySelectorAll('.nav-item');
+                this.initObserver();
+                this.bindEvents();
+            }
+
+            /**
+             * 初始化 Intersection Observer
+             * 監控章節進入可視區域
+             */
+            initObserver() {
+                const options = {
+                    root: null,
+                    rootMargin: '-20% 0px -70% 0px',
+                    threshold: 0
+                };
+
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            this.updateActiveNav(entry.target.id);
+                        }
+                    });
+                }, options);
+
+                this.sections.forEach(section => {
+                    this.observer.observe(section);
+                });
+            }
+
+            /**
+             * 綁定導航點擊事件
+             */
+            bindEvents() {
+                this.navItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const sectionId = item.dataset.section;
+                        this.scrollToSection(sectionId);
+                    });
+                });
+            }
+
+            /**
+             * 更新當前活動的導航項目
+             * @param {string} sectionId - 章節 ID
+             */
+            updateActiveNav(sectionId) {
+                this.navItems.forEach(item => {
+                    if (item.dataset.section === sectionId) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+
+            /**
+             * 平滑捲動至指定章節
+             * @param {string} sectionId - 章節 ID
+             */
+            scrollToSection(sectionId) {
+                const element = document.getElementById(sectionId);
+                if (element) {
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
+        }
+
+        // 初始化全局變數
+        let timerManager;
+        let progressManager;
+        let navigationController;
+
+        /**
+         * 複製程式碼到剪貼簿
+         * @param {HTMLElement} button - 複製按鈕元素
+         */
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block-wrapper').querySelector('code');
+            const code = codeBlock.textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                // 更新按鈕狀態
+                const originalHTML = button.innerHTML;
+                button.classList.add('copied');
+                button.innerHTML = '<i class="fas fa-check"></i><span>已複製!</span>';
+
+                // 顯示通知
+                showNotification('程式碼已複製到剪貼簿!', 'success');
+
+                // 2 秒後恢復按鈕
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    button.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => {
+                console.error('複製失敗:', err);
+                showNotification('複製失敗,請手動複製', 'error');
+            });
+        }
+
+        /**
+         * 標記章節為已完成/取消完成
+         * @param {string} sectionId - 章節 ID
+         */
+        function markComplete(sectionId) {
+            if (progressManager.isComplete(sectionId)) {
+                progressManager.unmarkComplete(sectionId);
+                showNotification('已取消完成標記', 'info');
+            } else {
+                progressManager.markComplete(sectionId);
+                showNotification('章節已標記為完成!', 'success');
+            }
+        }
+
+        /**
+         * 顯示通知訊息
+         * @param {string} message - 訊息內容
+         * @param {string} type - 訊息類型 (success/error/info)
+         */
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+
+            notificationText.textContent = message;
+
+            // 設定背景顏色
+            if (type === 'success') {
+                notification.style.background = 'var(--success)';
+            } else if (type === 'error') {
+                notification.style.background = 'var(--danger)';
+            } else {
+                notification.style.background = 'var(--primary)';
+            }
+
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        /**
+         * 頁面載入完成後初始化
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化程式碼高亮
+            Prism.highlightAll();
+
+            // 初始化計時器管理器
+            timerManager = new TimerManager();
+            timerManager.updateButtons();
+
+            // 初始化進度管理器
+            progressManager = new ProgressManager();
+            progressManager.updateUI();
+
+            // 初始化導航控制器
+            navigationController = new NavigationController();
+
+            console.log('Gemini CLI 教學網站已載入完成!');
+        });
+    </script>
+</body>
+</html>

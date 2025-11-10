@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube 頻道分析</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .card {
+            margin-bottom: 30px;
+        }
+        .card-header {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="text-center mb-5">
+            <h1>YouTube 頻道分析</h1>
+            <p class="lead">與 "The DoDo Men - 嘟嘟人" 相似的頻道數據</p>
+        </header>
+
+        <!-- Chart Card -->
+        <div class="card">
+            <div class="card-header">
+                訂閱數比較 (單位: 萬)
+            </div>
+            <div class="card-body">
+                <canvas id="subscriberChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Data Table Card -->
+        <div class="card">
+            <div class="card-header">
+                詳細數據
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>頻道名稱</th>
+                                <th>訂閱數</th>
+                                <th>影片數</th>
+                            </tr>
+                        </thead>
+                        <tbody id="channel-data">
+                            <tr>
+                                <td>這群人TGOP</td>
+                                <td>345萬</td>
+                                <td>484</td>
+                            </tr>
+                            <tr>
+                                <td>WACKYBOYS 反骨男孩</td>
+                                <td>158萬</td>
+                                <td>1344</td>
+                            </tr>
+                            <tr>
+                                <td>眾量級CROWD</td>
+                                <td>194萬</td>
+                                <td>807</td>
+                            </tr>
+                            <tr>
+                                <td>蔡阿嘎</td>
+                                <td>254萬</td>
+                                <td>1164</td>
+                            </tr>
+                            <tr>
+                                <td>綜藝玩很大Mr.Player</td>
+                                <td>156萬</td>
+                                <td>3936</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Data from the table
+        const channels = [
+            { name: '這群人TGOP', subscribers: 345, videos: 484 },
+            { name: 'WACKYBOYS 反骨男孩', subscribers: 158, videos: 1344 },
+            { name: '眾量級CROWD', subscribers: 194, videos: 807 },
+            { name: '蔡阿嘎', subscribers: 254, videos: 1164 },
+            { name: '綜藝玩很大Mr.Player', subscribers: 156, videos: 3936 }
+        ];
+
+        const channelNames = channels.map(c => c.name);
+        const subscriberData = channels.map(c => c.subscribers);
+
+        // Render Chart
+        const ctx = document.getElementById('subscriberChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: channelNames,
+                datasets: [{
+                    label: '訂閱數 (萬)',
+                    data: subscriberData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '訂閱數 (萬)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

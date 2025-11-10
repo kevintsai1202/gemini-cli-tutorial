@@ -1,0 +1,18 @@
+# 作業系統
+.DS_Store
+Thumbs.db
+
+# 編輯器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 臨時檔案
+*.log
+*.tmp
+
+# 安裝檔案(檔案太大)
+安裝/
+SOP.zip
+圓形去背.png
