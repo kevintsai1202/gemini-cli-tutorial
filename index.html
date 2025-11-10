@@ -1751,6 +1751,66 @@
                 </div>
             </div>
 
+            <!-- 實作練習：使用 Gemini CLI 整理資料夾 -->
+            <div class="subsection">
+                <h3 class="subsection-title"><i class="fas fa-code"></i> 實作練習：使用 Gemini CLI 整理資料夾</h3>
+
+                <div class="subsection-content">
+                    <p>在日常工作中,我們經常需要整理散亂的檔案。現在輪到你實際操作,透過 Gemini CLI 生成腳本來自動化這些任務。請嘗試完成以下三個練習:</p>
+
+                    <h4>練習 1：依據副檔名整理目錄</h4>
+                    <p><strong>任務目標:</strong> 撰寫一個腳本,將資料夾中的檔案依照副檔名分類到不同的子資料夾中。</p>
+
+                    <div class="info-box">
+                        <strong><i class="fas fa-lightbulb"></i> Gemini CLI 提示詞參考:</strong>
+                        <p style="margin-top: 0.5rem;">「請幫我寫一個 PowerShell 腳本,將當前資料夾中的所有檔案依照副檔名分類到不同的子資料夾中。例如所有 .pdf 檔案移到 PDF 資料夾,.docx 檔案移到 DOCX 資料夾。」</p>
+                    </div>
+
+                    <h4>練習 2：依據日期整理目錄</h4>
+                    <p><strong>任務目標:</strong> 撰寫一個腳本,將檔案依照修改日期分類到「年-月」格式的資料夾中。</p>
+
+                    <div class="info-box">
+                        <strong><i class="fas fa-lightbulb"></i> Gemini CLI 提示詞參考:</strong>
+                        <p style="margin-top: 0.5rem;">「請幫我寫一個 PowerShell 腳本,將當前資料夾中的所有檔案依照修改日期分類到『年-月』格式的資料夾中。例如 2024 年 3 月修改的檔案移到 2024-03 資料夾。」</p>
+                    </div>
+
+                    <h4>練習 3：依據 PDF 類型(掃描 or 標準格式)整理目錄</h4>
+                    <p><strong>任務目標:</strong> 撰寫腳本分析 PDF 檔案,判斷是掃描檔(圖片型)還是標準格式(文字型),並分類到不同資料夾。</p>
+
+                    <div class="warning-box">
+                        <strong><i class="fas fa-exclamation-triangle"></i> 提示:</strong>
+                        <p style="margin-top: 0.5rem;">此功能需要安裝 Python 和 PyPDF2 套件。請先執行: <code>pip install PyPDF2</code></p>
+                    </div>
+
+                    <div class="info-box">
+                        <strong><i class="fas fa-lightbulb"></i> Gemini CLI 提示詞參考:</strong>
+                        <p style="margin-top: 0.5rem;">「請幫我寫一個 PowerShell 腳本,搭配 Python 來判斷 PDF 是掃描檔還是標準格式。如果 PDF 中可以提取到文字就是標準格式,否則是掃描檔。然後將它們分類到 PDF_Standard 和 PDF_Scanned 兩個資料夾。」</p>
+                    </div>
+
+                    <div class="success-box">
+                        <strong><i class="fas fa-graduation-cap"></i> 實作步驟建議:</strong>
+                        <ol style="margin-top: 0.5rem; margin-bottom: 0;">
+                            <li>準備一個測試資料夾,放入一些不同類型的檔案</li>
+                            <li>開啟終端機,使用 <code>gemini</code> 指令啟動對話</li>
+                            <li>將上述提示詞輸入給 Gemini CLI</li>
+                            <li>檢視 AI 產生的程式碼,理解其運作邏輯</li>
+                            <li>執行腳本並觀察結果</li>
+                            <li>如果有需要調整的地方,繼續與 Gemini 對話優化</li>
+                        </ol>
+                    </div>
+
+                    <div class="success-box">
+                        <strong><i class="fas fa-check-circle"></i> 學習重點:</strong>
+                        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                            <li>學會使用 Gemini CLI 生成自動化腳本</li>
+                            <li>理解如何透過清晰的提示詞獲得想要的程式碼</li>
+                            <li>掌握檔案整理的常見模式:副檔名、日期、內容類型</li>
+                            <li>了解如何結合 PowerShell 和 Python 處理複雜任務</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <button class="complete-btn" onclick="markComplete('section-1')">
                 <i class="fas fa-check"></i>
                 <span>標記為已完成</span>
@@ -1961,6 +2021,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-powershell.min.js"></script>
 
     <script>
         /**
