@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(Start-Process \"D:\\GitHub\\Gemini CLI課程\\index.html\")",
-      "Bash(powershell -Command \"Start-Process ''D:\\GitHub\\Gemini CLI課程\\index.html''\")"
+      "Bash(powershell -Command \"Start-Process ''D:\\GitHub\\Gemini CLI課程\\index.html''\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []

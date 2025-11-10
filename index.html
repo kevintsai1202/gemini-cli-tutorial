@@ -913,8 +913,8 @@
                     <h4>成果展示</h4>
                     <p>在本課程中,我們將會完成以下幾個小專案:</p>
                     <ol>
-                        <li><strong>自動更新腳本:</strong> 使用 Gemini CLI 撰寫一個能夠自動更新 CLI 環境的批次腳本</li>
-                        <li><strong>頻道分析報告:</strong> 自動蒐集指定 YouTube 頻道的資訊,找出相似的頻道進行比較,並最終產出詳細的比較報告</li>
+                        <li><strong>資料處理腳本:</strong> 使用 Gemini CLI 撰寫資料整理腳本</li>
+                        <li><strong>YT 頻道分析報告:</strong> 自動蒐集指定 YouTube 頻道的資訊,找出相似的頻道進行比較,並最終產出詳細的比較報告</li>
                         <li><strong>YT 影片字幕產生器:</strong> 提供一個 YouTube 影片連結,Gemini CLI 將自動轉換為字幕檔並生成影片摘要</li>
                     </ol>
                 </div>
@@ -991,6 +991,16 @@ gemini</code></pre>
                     <ul>
                         <li><strong>管道 (|):</strong> 此符號可將前一個指令的結果當作下一個指令的輸入,可將 Shell 指令的輸出直接傳給 Gemini,或將檔案內容作為輸入</li>
                     </ul>
+                    <div class="code-block-wrapper">
+                        <div class="code-header">
+                            <span class="code-language">bash</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="far fa-copy"></i>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="line-numbers"><code class="language-bash">ls -Recurse | gemini "有多少檔案?"</code></pre>
+                    </div>
                 </div>
             </div>
 
