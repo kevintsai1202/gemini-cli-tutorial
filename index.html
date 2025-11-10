@@ -1063,6 +1063,102 @@
             }
         }
 
+        /* 手機版漢堡選單按鈕 */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1002;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: var(--transition);
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .mobile-menu-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        /* 漢堡選單開啟時的動畫 */
+        .mobile-menu-btn.open span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .mobile-menu-btn.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-btn.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* 手機版主題切換按鈕 */
+        .mobile-theme-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1002;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: var(--transition);
+        }
+
+        .mobile-theme-toggle:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .mobile-theme-toggle i {
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        /* 遮罩層 */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
         /* 響應式設計 */
         @media (max-width: 768px) {
             .sidebar {
@@ -1073,9 +1169,19 @@
                 transform: translateX(0);
             }
 
+            .sidebar-toggle {
+                display: none;
+            }
+
+            .mobile-menu-btn,
+            .mobile-theme-toggle {
+                display: flex;
+            }
+
             .main-content {
                 margin-left: 0;
                 padding: 1rem;
+                padding-top: 5rem;
             }
 
             .hero-section {
@@ -1149,8 +1255,23 @@
     </style>
 </head>
 <body>
+    <!-- 手機版漢堡選單按鈕 -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="開啟選單">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- 手機版主題切換按鈕 -->
+    <button class="mobile-theme-toggle" id="mobile-theme-toggle" aria-label="切換主題">
+        <i class="fas fa-sun" id="mobile-theme-icon"></i>
+    </button>
+
+    <!-- 側邊欄遮罩層 -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <!-- 側邊欄導航 -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <!-- 縮放按鈕 -->
         <div class="sidebar-toggle" onclick="sidebarManager.toggle()">
             <i class="fas fa-chevron-left" id="toggle-icon"></i>
@@ -1969,10 +2090,110 @@
                 if (this.currentTheme === 'light') {
                     this.themeIcon.className = 'theme-icon fas fa-moon';
                     this.themeText.textContent = '切換夜間模式';
+                    // 同步更新手機版圖示
+                    const mobileIcon = document.getElementById('mobile-theme-icon');
+                    if (mobileIcon) {
+                        mobileIcon.className = 'fas fa-moon';
+                    }
                 } else {
                     this.themeIcon.className = 'theme-icon fas fa-sun';
                     this.themeText.textContent = '切換日間模式';
+                    // 同步更新手機版圖示
+                    const mobileIcon = document.getElementById('mobile-theme-icon');
+                    if (mobileIcon) {
+                        mobileIcon.className = 'fas fa-sun';
+                    }
                 }
+            }
+        }
+
+        /**
+         * 手機版選單管理器
+         * 負責管理手機版的側邊欄開關與主題切換
+         */
+        class MobileMenuManager {
+            constructor() {
+                // DOM 元素
+                this.menuBtn = document.getElementById('mobile-menu-btn');
+                this.themeBtn = document.getElementById('mobile-theme-toggle');
+                this.sidebar = document.getElementById('sidebar');
+                this.overlay = document.getElementById('sidebar-overlay');
+
+                // 綁定事件
+                this.bindEvents();
+            }
+
+            /**
+             * 綁定事件監聽器
+             */
+            bindEvents() {
+                // 漢堡選單按鈕點擊事件
+                if (this.menuBtn) {
+                    this.menuBtn.addEventListener('click', () => this.toggleMenu());
+                }
+
+                // 手機版主題切換按鈕點擊事件
+                if (this.themeBtn) {
+                    this.themeBtn.addEventListener('click', () => {
+                        if (window.themeManager) {
+                            window.themeManager.toggle();
+                        }
+                    });
+                }
+
+                // 遮罩層點擊事件 - 關閉選單
+                if (this.overlay) {
+                    this.overlay.addEventListener('click', () => this.closeMenu());
+                }
+
+                // 導航項目點擊事件 - 自動關閉選單
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        // 延遲關閉,讓導航動畫順利進行
+                        setTimeout(() => this.closeMenu(), 300);
+                    });
+                });
+
+                // 監聽視窗大小變化,桌面版時自動關閉選單
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 768) {
+                        this.closeMenu();
+                    }
+                });
+            }
+
+            /**
+             * 切換選單開關狀態
+             */
+            toggleMenu() {
+                const isOpen = this.sidebar.classList.contains('open');
+
+                if (isOpen) {
+                    this.closeMenu();
+                } else {
+                    this.openMenu();
+                }
+            }
+
+            /**
+             * 打開選單
+             */
+            openMenu() {
+                this.sidebar.classList.add('open');
+                this.overlay.classList.add('show');
+                this.menuBtn.classList.add('open');
+                document.body.style.overflow = 'hidden'; // 防止背景滾動
+            }
+
+            /**
+             * 關閉選單
+             */
+            closeMenu() {
+                this.sidebar.classList.remove('open');
+                this.overlay.classList.remove('show');
+                this.menuBtn.classList.remove('open');
+                document.body.style.overflow = ''; // 恢復滾動
             }
         }
 
@@ -2360,6 +2581,7 @@
         // 初始化全局變數
         let sidebarManager;
         let themeManager;
+        let mobileMenuManager;
         let timerManager;
         let progressManager;
         let navigationController;
@@ -2462,6 +2684,11 @@
 
             // 初始化主題管理器
             themeManager = new ThemeManager();
+            // 將 themeManager 設為全局變數供手機版使用
+            window.themeManager = themeManager;
+
+            // 初始化手機版選單管理器
+            mobileMenuManager = new MobileMenuManager();
 
             // 初始化計時器管理器
             timerManager = new TimerManager();
